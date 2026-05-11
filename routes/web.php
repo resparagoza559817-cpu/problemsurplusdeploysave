@@ -7,7 +7,7 @@ use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('/products');
+    return view('products.index');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
