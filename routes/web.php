@@ -5,16 +5,15 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Product; // Add this at the very top with the other 'use' lines
+use App\Models\Product; 
 
+// Homepage Route
 Route::get('/', function () {
-    // 1. Grab the products from the database
     $products = Product::with('category')->get();
-
-    // 2. Pass them to the view
     return view('products.index', compact('products'));
 });
 
+// Protected Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard & POS
     Route::get('/dashboard', [OrderController::class, 'dashboard'])->name('dashboard');

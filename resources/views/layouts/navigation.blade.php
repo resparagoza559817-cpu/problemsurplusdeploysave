@@ -21,32 +21,44 @@
                         {{ __('Sales History') }}
                     </x-nav-link>
 
-                    @if(Auth::user()->role === 'admin')
-                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
-                            {{ __('Inventory Management') }}
-                        </x-nav-link>
-                    @endif
+                    {{-- FIXED: Only check role if user is logged in --}}
+                    @auth
+                        @if(Auth::user()->role === 'admin')
+                            <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                                {{ __('Inventory Management') }}
+                            </x-nav-link>
+                        @endif
+                    @endauth
                 </div>
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition">
-                            <div>{{ Auth::user()->name }} ({{ strtoupper(Auth::user()->role) }})</div>
-                        </button>
-                    </x-slot>
+                @auth
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition">
+                                <div>{{ Auth::user()->name }} ({{ strtoupper(Auth::user()->role) }})</div>
+                            </button>
+                        </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                        <x-slot name="content">
+                            <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                @endauth
+
+                @guest
+                    <div class="space-x-4">
+                        <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">Log in</a>
+                        <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline">Register</a>
+                    </div>
+                @endguest
             </div>
         </div>
     </div>
