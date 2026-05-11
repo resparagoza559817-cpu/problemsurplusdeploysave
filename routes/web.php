@@ -5,9 +5,14 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Product; // Add this at the very top with the other 'use' lines
 
 Route::get('/', function () {
-    return view('products.index');
+    // 1. Grab the products from the database
+    $products = Product::with('category')->get();
+
+    // 2. Pass them to the view
+    return view('products.index', compact('products'));
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
