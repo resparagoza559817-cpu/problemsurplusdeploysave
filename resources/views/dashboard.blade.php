@@ -1,132 +1,104 @@
 <x-app-layout>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="chalkboard-container shadow-2xl relative p-12" style="border: 12px solid #3d2b1f; background-color: #1a2e26;">
-                
-                <div class="flex justify-between items-end mb-16 border-b-4 border-double border-white/20 pb-6">
-                    <div>
-                        <h1 class="text-5xl text-yellow-400 uppercase tracking-tighter font-black" style="text-shadow: 3px 3px #000;">
-                            Problem Solver Surplus
-                        </h1>
-                        <p class="text-gray-400 font-mono text-sm mt-2 tracking-widest uppercase">Inventory Management System // v1.0</p>
+    <style>
+        .stats-body {
+            background: url('/bgbgbg2.png') no-repeat center center fixed;
+            background-size: cover;
+            height: calc(100vh - 65px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Comic Sans MS", cursive !important;
+            padding: 5px;
+        }
+        .chalk-board {
+            width: 98%;
+            max-width: 1050px;
+            height: 92%; 
+            background: url('/BlankChalk.png') no-repeat center center;
+            background-size: 100% 100%;
+            padding: 30px 60px; /* Reduced top/bottom padding */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 5px;
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(255,255,255,0.2);
+            padding: 10px;
+            text-align: center;
+        }
+        .stat-value { font-size: 1.4rem; font-weight: bold; color: #facc15; }
+        .stat-label { font-size: 0.65rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 2px; }
+        .comparison { font-size: 0.6rem; color: #bbb; font-style: italic; display: block; }
+        
+        .inventory-section {
+            margin-top: 15px; /* Tightened space between sections */
+            border-top: 1px dashed rgba(255,255,255,0.2);
+            padding-top: 10px;
+        }
+        
+        .low-stock { color: #ff4444 !important; border-color: #ff4444 !important; }
+        .footer-text { text-align: center; opacity: 0.4; font-size: 0.7rem; padding-bottom: 5px; }
+    </style>
+
+    <div class="stats-body">
+        <div class="chalk-board">
+            <div>
+                <h1 class="text-2xl font-bold border-b-2 border-white/20 pb-1 uppercase italic mb-3">
+                    Store Performance
+                </h1>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Sales Today</div>
+                        <div class="stat-value">₱{{ number_format($revenueToday, 2) }}</div>
+                        <span class="comparison">Yesterday: ₱{{ number_format($revenueYesterday, 2) }}</span>
                     </div>
-                
-                    @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('products.create') }}" class="pixel-btn transform hover:scale-105 transition-transform" style="padding: 15px 25px;">
-                            [+] LOG NEW SUPPLY
-                        </a>
-                    @endif
+
+                    <div class="stat-box">
+                        <div class="stat-label">This Week</div>
+                        <div class="stat-value">₱{{ number_format($revenueThisWeek, 2) }}</div>
+                        <span class="comparison">Last: ₱{{ number_format($revenueLastWeek, 2) }}</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-label">Lifetime</div>
+                        <div class="stat-value">₱{{ number_format($totalMoney, 2) }}</div>
+                        <span class="comparison">Total Earnings</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-value">{{ $totalSalesCount }}</div>
+                        <span class="comparison">Total Orders</span>
+                    </div>
                 </div>
 
-                <div class="mb-8 p-4 bg-black/40 border-2 border-gray-600">
-                    <form action="{{ route('dashboard') }}" method="GET" class="flex flex-wrap items-center gap-4">
-                        
-                        <div class="flex flex-col">
-                            <label class="text-yellow-400 font-mono text-xs uppercase mb-1">Filter Type</label>
-                            <select name="category_id" onchange="this.form.submit()" 
-                                    class="bg-white font-bold border-2 border-gray-400 p-2" 
-                                    style="color: #059669 !important;">
-                                <option value="">All Collections</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                <div class="inventory-section">
+                    <h2 class="text-lg font-bold mb-2 opacity-50 uppercase tracking-widest text-center">Inventory Status</h2>
+                    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 450px; margin: 0 auto;">
+                        <div class="stat-box">
+                            <div class="stat-label">Total Products</div>
+                            <div class="stat-value">{{ $totalProducts }}</div>
                         </div>
-
-                        <div class="flex flex-col">
-                            <label class="text-yellow-400 font-mono text-xs uppercase mb-1">Sort By</label>
-                            <select name="sort" onchange="this.form.submit()" 
-                                    class="bg-white font-bold border-2 border-gray-400 p-2" 
-                                    style="color: #059669 !important;">
-                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name (A-Z)</option>
-                                <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Price</option>
-                                <option value="stock" {{ request('sort') == 'stock' ? 'selected' : '' }}>Stock Level</option>
-                                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Latest Entry</option>
-                            </select>
-                        </div>
-
-                        <div class="flex flex-col">
-                            <label class="text-yellow-400 font-mono text-xs uppercase mb-1">Order</label>
-                            <select name="direction" onchange="this.form.submit()" 
-                                    class="bg-white font-bold border-2 border-gray-400 p-2" 
-                                    style="color: #059669 !important;">
-                                <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Ascending</option>
-                                <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>Descending</option>
-                            </select>
-                        </div>
-
-                        <div class="flex items-end h-full mt-5">
-                            <a href="{{ route('dashboard') }}" class="text-white hover:text-yellow-400 font-mono text-xs uppercase underline">
-                                [ Clear Filters ]
-                            </a>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="space-y-12">
-                    @forelse ($products as $p)
-                    <div class="product-shelf-row border-b-2 border-dashed border-white/30 pb-10 mb-10 flex space-x-12 items-start">
-                        
-                        <div class="flex-shrink-0">
-                            <div style="width: 160px; height: 160px;" class="bg-black/60 border-4 border-white flex items-center justify-center overflow-hidden shadow-[5px_5px_0px_0px_rgba(255,255,255,0.2)]">
-                                @if($p->image_path)
-                                    <img src="{{ asset('storage/' . $p->image_path) }}" 
-                                         alt="{{ $p->name }}" 
-                                         style="max-width: 100%; max-height: 100%; object-fit: contain;"
-                                         class="pixelated-img">
-                                @else
-                                    <span class="text-xs text-gray-500 uppercase tracking-widest text-center px-2">No Visual Model</span>
-                                @endif
-                            </div>
-
-                            @if(Auth::user()->role === 'admin')
-                                <div class="mt-4 flex flex-col space-y-2" style="width: 160px;">
-                                    <a href="{{ route('products.edit', $p->id) }}" class="pixel-btn text-center text-xs py-1">EDIT DATA</a>
-                                    <form action="{{ route('products.destroy', $p->id) }}" method="POST" onsubmit="return confirm('De-list this supply?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="pixel-btn w-full text-xs py-1" style="background: #ff4444;">[X] DELETE</button>
-                                    </form>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="flex-grow">
-                            <h3 class="text-4xl text-white font-bold mb-4 uppercase tracking-wide">
-                                {{ $p->name }}
-                            </h3>
-                            
-                            <div class="flex space-x-12 mb-6">
-                                <div class="bg-white/5 border-l-4 border-green-400 px-4 py-2">
-                                    <p class="text-gray-400 text-xs uppercase font-mono">Current Value</p>
-                                    <span class="text-green-400 text-3xl font-black">${{ number_format($p->price, 2) }}</span>
-                                </div>
-                                <div class="bg-white/5 border-l-4 border-yellow-400 px-4 py-2">
-                                    <p class="text-gray-400 text-xs uppercase font-mono">Stock Level</p>
-                                    <span class="text-white text-3xl font-bold">{{ $p->stock }} <small class="text-sm text-gray-400">UNITS</small></span>
-                                </div>
-                            </div>
-
-                            @if($p->description)
-                                <div class="relative bg-black/20 p-4 border-l-2 border-white/20">
-                                    <p class="text-gray-300 text-lg font-sans italic leading-relaxed">
-                                        "{{ $p->description }}"
-                                    </p>
-                                </div>
-                            @else
-                                <p class="text-gray-600 italic text-sm">-- No further data logs available --</p>
-                            @endif
+                        <div class="stat-box {{ $lowStockCount > 0 ? 'low-stock' : '' }}">
+                            <div class="stat-label">Low Stock Alert</div>
+                            <div class="stat-value">{{ $lowStockCount }}</div>
                         </div>
                     </div>
-                    @empty
-                        <div class="text-center py-20">
-                            <p class="text-gray-500 text-2xl font-mono uppercase tracking-[0.5em]">Inventory Depleted</p>
-                        </div>
-                    @endforelse
                 </div>
-            </div> 
+            </div>
+
+            <div class="footer-text">
+                CHALKBOARD UPDATED: {{ now()->format('h:i A') }}
+            </div>
         </div>
     </div>
 </x-app-layout>

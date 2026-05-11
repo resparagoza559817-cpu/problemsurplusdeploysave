@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
 {
-    Schema::create('orders', function (Blueprint $col) {
-        $col->id();
-        $col->string('customer_name');
-        $col->text('customer_address')->nullable();
-        $col->decimal('total_amount', 10, 2);
-        $col->string('payment_method'); // Cash or GCash (replacing Delivery)
-        $col->timestamps();
+    Schema::create('orders', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Tracks which clerk sold it
+        $table->string('customer_name')->default('Walk-in');
+        $table->text('customer_address')->nullable();
+        $table->decimal('total_amount', 10, 2);
+        $table->decimal('cash_tendered', 10, 2)->default(0);
+        $table->decimal('change_amount', 10, 2)->default(0);
+        $table->text('items_json'); // Stores what was actually bought
+        $table->string('payment_method');
+        $table->timestamps();
     });
 }
 

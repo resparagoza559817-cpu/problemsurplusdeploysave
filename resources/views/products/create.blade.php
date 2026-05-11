@@ -14,36 +14,33 @@
 
                     <div class="flex space-x-8">
                         <div class="flex-1">
-                            <label class="block text-2xl text-white mb-2 font-mono uppercase">Price ($)</label>
+                            <label class="block text-2xl text-white mb-2 font-mono uppercase">Price (₱)</label>
                             <input type="number" name="price" step="0.01" class="w-full bg-white border-2 border-gray-400 p-3 text-xl shadow-inner" style="color: #059669 !important; font-weight: bold;" required>
                         </div>
                         <div class="flex-1">
-                            <label class="block text-2xl text-white mb-2 font-mono uppercase">Stock</label>
+                            <label class="block text-2xl text-white mb-2 font-mono uppercase">Stock Qty</label>
                             <input type="number" name="stock" class="w-full bg-white border-2 border-gray-400 p-3 text-xl shadow-inner" style="color: #059669 !important; font-weight: bold;" required>
                         </div>
                     </div>
 
                     <div>
-    <label class="block text-2xl text-white mb-2 font-mono uppercase">Category</label>
-    <div class="flex space-x-2">
-        <select name="category_id" class="w-full bg-white border-2 border-gray-400 p-3 text-xl shadow-inner font-bold" style="color: #059669 !important;">
-            @foreach($categories as $category)
-                <option value="{{ $category->id }}">{{ $category->name }}</option>
-            @endforeach
-        </select>
-        <a href="{{ route('categories.index') }}" class="pixel-btn flex items-center justify-center" style="background: #fbbf24; width: 60px; color: black;">+</a>
-    </div>
-</div>
-
-                    <div>
-                        <label class="block text-2xl text-white mb-2 font-mono uppercase">Details / Warnings</label>
-                        <textarea name="description" rows="3" class="w-full bg-white border-2 border-gray-400 p-3 text-lg focus:outline-none shadow-inner" style="color: #059669 !important; font-weight: bold;" placeholder="Type info here..."></textarea>
+                        <label class="block text-2xl text-white mb-2 font-mono uppercase">Category</label>
+                        <select name="category_id" class="w-full bg-white border-2 border-gray-400 p-3 text-xl focus:outline-none shadow-inner" style="color: #059669 !important; font-weight: bold;" required>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div>
-                        <label class="block text-2xl text-white mb-2 font-mono uppercase">Visual Model</label>
-                        <div id="drop-zone" class="w-full h-32 border-4 border-dashed border-green-500 flex flex-col items-center justify-center cursor-pointer hover:bg-black/40 transition">
-                            <span class="text-green-500 font-bold uppercase">Click or Drag Image</span>
+                        <label class="block text-2xl text-white mb-2 font-mono uppercase italic">Supply Lore / Warnings</label>
+                        <textarea name="description" rows="3" class="w-full bg-white border-2 border-gray-400 p-3 text-lg focus:outline-none shadow-inner" style="color: #059669 !important; font-weight: bold;" placeholder="Optional notes..."></textarea>
+                    </div>
+
+                    <div class="bg-black/20 p-4 border-2 border-dashed border-white/30">
+                        <label class="block text-yellow-400 text-xs mb-2 uppercase tracking-widest">Visual Model Upload</label>
+                        <div id="drop-zone" class="cursor-pointer hover:bg-white/5 transition p-6 text-center">
+                            <span class="text-white font-bold uppercase">Click or Drag Image</span>
                             <input type="file" name="image" id="file-input" class="hidden" accept="image/*">
                         </div>
                         <div id="preview-container" class="mt-4 hidden text-center">
@@ -53,7 +50,7 @@
 
                     <div class="flex space-x-4 pt-6">
                         <button type="submit" class="pixel-btn">Confirm Record</button>
-                        <a href="{{ route('dashboard') }}" class="pixel-btn" style="background: #ff4444;">Cancel</a>
+                        <a href="{{ route('products.index') }}" class="pixel-btn" style="background: #ff4444;">Cancel</a>
                     </div>
                 </form>
             </div>

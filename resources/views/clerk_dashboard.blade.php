@@ -1,301 +1,279 @@
 <x-app-layout>
     <style>
-        /* General Theme Styling */
-        .dashboard-body {
-            background: url('/bgbgbg2.png') no-repeat center center fixed;
-            background-size: cover;
-            height: 100vh;
+        .pos-body { 
+            background: url('/bgbgbg2.png') no-repeat center center fixed; 
+            background-size: cover; 
+            height: calc(100vh - 65px); 
+            display: flex; gap: 10px; padding: 10px; 
+            font-family: "Comic Sans MS", cursive !important; 
+            overflow: hidden; 
+        }
+        
+        #toast {
+            position: fixed; top: 70px; right: 20px;
+            background: #2e7d32; color: white; padding: 10px 20px;
+            border: 2px solid white; box-shadow: 4px 4px 0px black;
+            z-index: 999; font-weight: bold;
+        }
+
+        .cart-panel { 
+            flex: 0 0 280px; 
+            background: white; border: 4px solid black; 
+            display: flex; flex-direction: column; 
+            box-shadow: 5px 5px 0px #000; height: 100%;
             overflow: hidden;
-            font-family: "Comic Sans MS", cursive !important;
         }
 
-        .pos-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            gap: 25px;
-            padding: 20px;
+        .product-panel { 
+            flex: 1; 
+            background: url('/BlankChalk.png') no-repeat center center; 
+            background-size: 100% 100%; 
+            padding: 20px 35px; border: 4px solid #3d2b1f; 
+            display: flex; flex-direction: column; 
         }
 
-        /* LEFT PANEL: POS & Checkout */
-        .left-panel {
-            width: 420px;
-            background: white;
-            border: 6px solid black;
-            display: flex;
-            flex-direction: column;
-            height: 85vh;
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.2);
-        }
-
-        .clerk-header {
-            padding: 15px;
-            border-bottom: 6px solid black;
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            background: #eee;
-        }
-
-        .input-section { padding: 15px; border-bottom: 4px solid black; }
+        .scroll-v { overflow-y: auto; flex-grow: 1; }
         
-        .pos-input {
-            width: 100%;
-            border: 3px solid black;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            padding: 10px;
+        .prod-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+            gap: 12px; padding-bottom: 20px;
         }
 
-        .cart-area {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            border-bottom: 4px solid black;
-            background: #fafafa;
+        .item-node { 
+            background: rgba(255,255,255,0.1); border: 2px dashed white; 
+            padding: 10px; text-align: center; color: white; cursor: pointer;
+            transition: all 0.2s;
         }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            border-bottom: 2px dashed #ccc;
-            padding: 5px 0;
-        }
-
-        .total-box { padding: 15px; background: white; }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .change-display {
-            background: #fff59d;
-            border: 3px dashed black;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-        }
-
-        .btn-process {
-            width: 100%;
-            background: #bbbbbb;
-            border: 4px solid black;
-            padding: 18px;
-            font-weight: bold;
-            font-size: 1.3rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-        }
-
-        .btn-process.active {
-            background: #4caf50;
-            color: white;
-        }
-
-        /* RIGHT PANEL: Blackboard Menu */
-        .right-panel {
-            width: 750px;
-            background: url('/BlankChalk.png') no-repeat center center;
-            background-size: 100% 100%;
-            height: 85vh;
-            padding: 60px 50px;
-            overflow-y: auto;
-        }
-
-        .product-card {
-            background: rgba(0, 0, 0, 0.85);
-            border: 3px solid white;
-            margin-bottom: 20px;
-            display: flex;
-            padding: 15px;
-            color: white;
-            gap: 20px;
-        }
-
-        .product-card img {
-            width: 110px;
-            height: 110px;
-            border: 2px solid white;
-            object-fit: cover;
-        }
-
-        .prod-title { font-size: 1.6rem; font-weight: bold; text-transform: uppercase; }
-        .prod-desc { color: #00ffff; font-size: 0.95rem; margin-bottom: 8px; }
-        .prod-price { color: #0f0; font-size: 1.8rem; font-weight: bold; }
+        .item-node:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
         
-        .stock-tag { font-size: 0.9rem; display: block; margin-bottom: 5px; color: #aaa; }
-        .low-stock { color: #ff4444 !important; font-weight: bold; animation: blink 1s infinite; }
-
-        @keyframes blink { 50% { opacity: 0.5; } }
-
-        .btn-add-item {
-            background: #2563eb;
-            color: white;
-            border: 2px solid white;
-            padding: 8px 20px;
-            font-weight: bold;
-            cursor: pointer;
+        /* Product Image Style */
+        .prod-img {
+            width: 60px; height: 60px; object-fit: contain;
+            margin: 0 auto 5px; display: block;
+            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5));
         }
 
-        .btn-add-item:disabled { background: #444; color: #888; border-color: #666; cursor: not-allowed; }
+        .cat-btn { 
+            background: #3d2b1f; color: white; padding: 5px 15px; 
+            border: 2px solid white; margin-right: 5px; cursor: pointer;
+        }
+        .cat-btn.active { background: #facc15; color: black; }
+
+        .cart-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px; border-bottom: 2px solid #eee; font-size: 0.9rem;
+        }
+        
+        .qty-controls { display: flex; align-items: center; gap: 5px; }
+        .qty-btn {
+            background: black; color: white; width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; border: none; cursor: pointer; border-radius: 3px;
+        }
+
+        .checkout-box { padding: 15px; border-top: 4px solid black; background: #f9f9f9; }
+        
+        .input-flat { 
+            width: 100%; border: 2px solid black; padding: 8px; 
+            margin: 5px 0; font-family: inherit; font-weight: bold;
+            background: white !important; color: black !important;
+        }
+
+        .btn-pay { 
+            width: 100%; background: #ccc; color: #666; border: 3px solid black; 
+            padding: 10px; font-weight: bold; cursor: not-allowed; margin-top: 10px;
+        }
+        .btn-pay.ready { background: #facc15; color: black; cursor: pointer; }
     </style>
 
-    <div class="dashboard-body">
-        <div class="pos-wrapper">
-            <div class="left-panel">
-                <div class="clerk-header">CLERK POS</div>
-                
-                <form id="checkout-form" action="{{ route('checkout.process') }}" method="POST">
-                    @csrf
-                    <div class="input-section">
-                        <!-- THE TREND FIX: List attribute links to the datalist below[cite: 6] -->
-                        <input type="text" 
-                               name="customer_name" 
-                               id="customer_name_input"
-                               list="customer-trends" 
-                               placeholder="CUSTOMER NAME" 
-                               class="pos-input" 
-                               autocomplete="off"
-                               required>
-                        
-                        <datalist id="customer-trends">
-                            @foreach($customers as $customer)
-                                <option value="{{ $customer->customer_name }}">
-                            @endforeach
-                        </datalist>
+    @if(session('success'))
+        <div id="toast">{{ session('success') }}</div>
+    @endif
 
-                        <textarea name="customer_address" 
-                                  id="customer_address_input" 
-                                  placeholder="ADDRESS" 
-                                  class="pos-input" 
-                                  rows="2"></textarea>
-
-                        <select name="payment_method" class="pos-input font-bold">
-                            <option value="Cash">CASH</option>
-                            <option value="Card">CARD</option>
-                        </select>
-                    </div>
-
-                    <div class="cart-area" id="cart-display">
-                        <p class="text-gray-400 italic">No items added yet...</p>
-                    </div>
-
-                    <div class="total-box">
-                        <div class="price-row">
-                            <span>TOTAL:</span>
-                            <span id="total-text">$0.00</span>
-                        </div>
-                        
-                        <input type="number" id="cash-tendered" placeholder="CASH TENDERED" class="pos-input">
-                        <div class="change-display" id="change-text">CHANGE: $0.00</div>
-                        
-                        <input type="hidden" name="total_amount" id="total_amount_hidden">
-                        <input type="hidden" name="items" id="items_hidden">
-                        
-                        <button type="submit" id="process-btn" class="btn-process" disabled>ADD ITEMS TO START</button>
-                    </div>
-                </form>
+    <div class="pos-body">
+        <div class="cart-panel">
+            <div class="p-3 bg-black text-white font-bold text-center italic">CURRENT TRANSACTION</div>
+            
+            <div id="cart-list" class="scroll-v p-1">
+                <div class="text-center text-gray-400 mt-10">Cart is empty</div>
             </div>
 
-            <div class="right-panel">
-                @foreach($products as $product)
-                    <div class="product-card">
-                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
-                        <div style="flex-grow: 1;">
-                            <div class="prod-title">{{ $product->name }}</div>
-                            <div class="prod-desc">{{ $product->description }}</div>
-                            <span class="stock-tag {{ $product->stock <= 5 ? 'low-stock' : '' }}">
-                                STOCK: {{ $product->stock }}
-                            </span>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="prod-price">${{ number_format($product->price, 2) }}</span>
-                                <button type="button" 
-                                        onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, {{ $product->stock }})"
-                                        class="btn-add-item"
-                                        {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                    {{ $product->stock <= 0 ? 'OUT OF STOCK' : 'ADD' }}
-                                </button>
-                            </div>
+            <div class="checkout-box">
+                <div class="flex justify-between font-bold text-xl mb-2">
+                    <span>TOTAL:</span>
+                    <span id="cart-total">₱0.00</span>
+                </div>
+
+                <label class="text-xs font-bold">PAYMENT METHOD</label>
+                <select id="pay-method" class="input-flat">
+                    <option value="Cash">Cash</option>
+                    <option value="Card">G-Cash / Card</option>
+                </select>
+
+                <label class="text-xs font-bold">CASH TENDERED</label>
+                <input type="number" id="cash-in" class="input-flat" placeholder="0.00" step="0.01">
+
+                <div id="change-display" class="text-sm font-bold text-right text-blue-600 mt-1">CHANGE: ₱0.00</div>
+
+                <form action="{{ route('orders.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="total_amount" id="total-val">
+                    <input type="hidden" name="payment_method" id="method-val">
+                    <input type="hidden" name="items" id="items-val">
+                    <input type="hidden" name="cash_tendered" id="cash-val">
+                    <button type="submit" id="process-btn" class="btn-pay" disabled>SELECT ITEMS</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="product-panel">
+            <div class="flex justify-between items-center mb-4 border-b-2 border-white/20 pb-2">
+                <div class="flex">
+                    <button class="cat-btn active" onclick="filterCat('all')">ALL</button>
+                    @foreach($categories as $cat)
+                        <button class="cat-btn" onclick="filterCat('{{ $cat->id }}')">{{ strtoupper($cat->name) }}</button>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="scroll-v">
+                <div class="prod-grid">
+                    @foreach($products as $prod)
+                        <div class="item-node" 
+                             data-cat="{{ $prod->category_id }}"
+                             onclick="addToCart({{ $prod->id }}, '{{ $prod->name }}', {{ $prod->price }})">
+                            
+                            @if($prod->image)
+                                <img src="{{ asset('storage/' . $prod->image) }}" class="prod-img">
+                            @endif
+
+                            <div class="font-bold text-sm leading-tight mb-1">{{ $prod->name }}</div>
+                            <div class="text-yellow-400 font-bold">₱{{ $prod->price }}</div>
+                            <div class="text-[10px] opacity-60">STOCK: {{ $prod->stock }}</div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. DATA FOR TRENDS[cite: 6]
-        const customerData = @json($customers->pluck('customer_address', 'customer_name'));
-
-        // 2. AUTO-FILL LOGIC[cite: 6]
-        document.getElementById('customer_name_input').addEventListener('input', function(e) {
-            const name = e.target.value;
-            if (customerData[name]) {
-                document.getElementById('customer_address_input').value = customerData[name];
-            }
-        });
-
-        // --- Existing POS Logic ---
         let cart = [];
         let total = 0;
 
-        function addToCart(id, name, price, maxStock) {
-            let item = cart.find(i => i.id === id);
-            if(item) {
-                if(item.quantity < maxStock) {
-                    item.quantity++;
-                } else {
-                    alert("Cannot add more! Out of stock.");
-                    return;
-                }
+        function addToCart(id, name, price) {
+            const existing = cart.find(i => i.id === id);
+            if (existing) {
+                existing.quantity++;
             } else {
-                cart.push({ id: id, name: name, price: price, quantity: 1 });
+                cart.push({ id, name, price, quantity: 1 });
+            }
+            renderCart();
+        }
+
+        function updateQty(id, amount) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+
+            item.quantity += amount;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.id !== id);
             }
             renderCart();
         }
 
         function renderCart() {
-            const display = document.getElementById('cart-display');
-            const btn = document.getElementById('process-btn');
-            if(cart.length === 0) {
-                display.innerHTML = '<p class="text-gray-400 italic">No items added yet...</p>';
-                btn.disabled = true;
-                btn.classList.remove('active');
-                return;
+            const list = document.getElementById('cart-list');
+            list.innerHTML = '';
+            total = 0;
+
+            if (cart.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-400 mt-10">Cart is empty</div>';
             }
-            total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            display.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <span>${item.name} (x${item.quantity})</span>
-                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                </div>
-            `).join('');
-            document.getElementById('total-text').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('total_amount_hidden').value = total.toFixed(2);
-            document.getElementById('items_hidden').value = JSON.stringify(cart);
-            btn.disabled = false;
-            btn.classList.add('active');
-            btn.innerText = "PROCESS TRANSACTION";
-            calculateChange();
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                list.innerHTML += `
+                    <div class="cart-item">
+                        <div style="flex:1">
+                            <div class="font-bold">${item.name}</div>
+                            <div class="text-xs text-gray-500">₱${item.price} x ${item.quantity}</div>
+                        </div>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+                            <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+                        </div>
+                    </div>`;
+            });
+
+            document.getElementById('cart-total').innerText = `₱${total.toFixed(2)}`;
+            document.getElementById('total-val').value = total;
+            document.getElementById('items-val').value = JSON.stringify(cart);
+            validate();
         }
 
-        function calculateChange() {
-            const tendered = parseFloat(document.getElementById('cash-tendered').value) || 0;
-            const change = tendered - total;
-            const changeBox = document.getElementById('change-text');
-            changeBox.innerText = `CHANGE: $${Math.max(0, change).toFixed(2)}`;
-            changeBox.style.color = (tendered < total && tendered > 0) ? 'red' : 'black';
+        function validate() {
+            const btn = document.getElementById('process-btn');
+            const cashInput = document.getElementById('cash-in');
+            const method = document.getElementById('pay-method').value;
+            const cash = parseFloat(cashInput.value) || 0;
+            const change = cash - total;
+
+            document.getElementById('method-val').value = method;
+            document.getElementById('cash-val').value = cash;
+            document.getElementById('change-display').innerText = `CHANGE: ₱${Math.max(0, change).toFixed(2)}`;
+
+            if (cart.length > 0) {
+                if (method === 'Card') {
+                    // Card is always ready
+                    btn.disabled = false;
+                    btn.classList.add('ready');
+                    btn.innerText = "CONFIRM TRANSACTION";
+                } else {
+                    // Cash needs enough money
+                    if (cash >= total) {
+                        btn.disabled = false;
+                        btn.classList.add('ready');
+                        btn.innerText = "CONFIRM TRANSACTION";
+                    } else {
+                        btn.disabled = true;
+                        btn.classList.remove('ready');
+                        btn.innerText = "INSUFFICIENT CASH";
+                    }
+                }
+            } else {
+                btn.disabled = true;
+                btn.classList.remove('ready');
+                btn.innerText = "SELECT ITEMS";
+            }
         }
 
-        document.getElementById('cash-tendered').addEventListener('input', calculateChange);
+        function filterCat(id) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.item-node').forEach(c => {
+                c.style.display = (id === 'all' || c.dataset.cat === id) ? 'block' : 'none';
+            });
+        }
+
+        // Listeners
+        document.getElementById('cash-in').addEventListener('input', validate);
+        document.getElementById('pay-method').addEventListener('change', () => {
+            const cashInput = document.getElementById('cash-in');
+            if(document.getElementById('pay-method').value === 'Card') {
+                cashInput.value = ''; 
+                cashInput.style.opacity = '0.5';
+            } else {
+                cashInput.style.opacity = '1';
+            }
+            validate();
+        });
+
+        setTimeout(() => { 
+            const toast = document.getElementById('toast');
+            if(toast) toast.style.display = 'none'; 
+        }, 3000);
     </script>
 </x-app-layout>
